@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import Converter from '../../components/Converter/Converter'
 import styles from './ConverterPage.module.scss'
 import { listCurrency } from '../../types'
+import { CurrencyService } from '../../services/reqres/currency'
 
 const ConverterPage = () => {
     const refListCurrency = useRef<listCurrency>({})
@@ -10,10 +11,11 @@ const ConverterPage = () => {
     const [selectedCurrencyTo, setSelectedCurrencyTo] = useState('usd')
     const [valueFrom, setValueFrom] = useState(0)
     const [valueTo, setValueTo] = useState(1)
+    const [loading, setLoading] = useState(true)
 
     // При вводе значения в input надо произвести вычисления значения валюты и отобразить результат в правой колонке учитыевая какие выбраны валюты в обеих колонках
 
-    const onChangeValueFrom = (valueFrom: number) => {
+    const handleValueChangeFrom = (valueFrom: number) => {
         if (isNaN(valueFrom) || !refListCurrency.current[selectedCurrencyFrom] || !refListCurrency.current[selectedCurrencyTo]) {
             setValueTo(0)
             setValueFrom(0)
@@ -27,7 +29,7 @@ const ConverterPage = () => {
         setValueFrom(valueFrom)
     }
 
-    const onChangeValueTo = (valueTo: number) => {
+    const handleValueChangeTo = (valueTo: number) => {
         if (isNaN(valueTo) || !refListCurrency.current[selectedCurrencyFrom] || !refListCurrency.current[selectedCurrencyTo]) {
             setValueFrom(0)
             setValueTo(0)
@@ -40,28 +42,70 @@ const ConverterPage = () => {
         setValueTo(valueTo)
     }
 
+    const handleCurrencyChangeFrom = (currency: string) => {
+        setSelectedCurrencyFrom(currency)
+    }
+
+    const handleCurrencyChangeTo = (currency: string) => {
+        setSelectedCurrencyTo(currency)
+    }
+
+    /*     useEffect(() => {
+            fetch('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json')
+                .then((res) => res.json())
+                .then((json) => {
+                    refListCurrency.current = json.usd
+                    onChangeValueTo(1)
+                    setLoading(false)
+                })
+                .catch(error => {
+                    console.error(error)
+                    alert(error)
+                })
+        }, []) */
+
     useEffect(() => {
-        fetch('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json')
-            .then((res) => res.json())
+        CurrencyService.getCurrencyData()
             .then((json) => {
-                refListCurrency.current = json.usd
-                onChangeValueTo(1)
+                console.log(json.usd)
+                refListCurrency.current = json.usd;
+                handleValueChangeTo(1)
+                setLoading(false)
+            })
+            .catch((error) => {
+                console.error(error);
+                alert(error)
             })
     }, [])
 
     useEffect(() => {
-        onChangeValueFrom(valueFrom);
-    }, [selectedCurrencyFrom, valueFrom]);
-
-    useEffect(() => {
-        onChangeValueFrom(valueFrom);
-    }, [selectedCurrencyTo, valueFrom]);
-
+        handleValueChangeFrom(valueFrom);
+    }, [selectedCurrencyFrom, selectedCurrencyTo, valueFrom]);
 
     return (
         <div className={styles.ConverterPage}>
-            <Converter listCurrency={refListCurrency.current} selectedCurrency={selectedCurrencyFrom} setSelectedCurrency={setSelectedCurrencyFrom} value={valueFrom} setValue={setValueFrom} onChangeValue={onChangeValueFrom} />
-            <Converter listCurrency={refListCurrency.current} selectedCurrency={selectedCurrencyTo} setSelectedCurrency={setSelectedCurrencyTo} value={valueTo} setValue={setValueTo} onChangeValue={onChangeValueTo} />
+            {
+                loading ?
+                    <div className={styles.ConverterPage__loader}></div>
+                    :
+                    <div className={styles.ConverterPage__block}>
+                        <Converter
+                            listCurrency={refListCurrency.current}
+                            selectedCurrency={selectedCurrencyFrom}
+                            value={valueFrom}
+                            onCurrencyChange={handleCurrencyChangeFrom}
+                            onChangeValue={handleValueChangeFrom}
+                        />
+                        <Converter
+                            listCurrency={refListCurrency.current}
+                            selectedCurrency={selectedCurrencyTo}
+                            value={valueTo}
+                            onCurrencyChange={handleCurrencyChangeTo}
+                            onChangeValue={handleValueChangeTo}
+                        />
+                    </div>
+            }
+
         </div>
     )
 }

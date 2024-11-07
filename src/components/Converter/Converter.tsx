@@ -5,21 +5,19 @@ import styles from './Converter.module.scss'
 interface ConverterProps {
     listCurrency: listCurrency;
     selectedCurrency: string;
-    setSelectedCurrency: Dispatch<SetStateAction<string>>;
     value: number;
-    setValue: Dispatch<SetStateAction<number>>;
+    onCurrencyChange: (currency: string) => void;
     onChangeValue: (value: number) => void;
 }
 
-const Converter: React.FC<ConverterProps> = ({ listCurrency, selectedCurrency, setSelectedCurrency, value, setValue, onChangeValue }) => {
+const Converter: React.FC<ConverterProps> = ({ listCurrency, selectedCurrency, onCurrencyChange, value, onChangeValue }) => {
 
     const handleChangeInput = (e: ChangeEvent<HTMLInputElement>) => {
-        setValue(Number(e.target.value))
         onChangeValue(Number(e.target.value))
     }
 
     const handleChangeCurrency = (e: ChangeEvent<HTMLSelectElement>) => {
-        setSelectedCurrency(e.target.value)
+        onCurrencyChange(e.target.value)
     }
 
     return (
@@ -32,7 +30,7 @@ const Converter: React.FC<ConverterProps> = ({ listCurrency, selectedCurrency, s
                             className={styles.Converter__block_currency_form_select}
                             name='currency'
                             value={selectedCurrency}
-                            onChange={(e) => handleChangeCurrency(e)}
+                            onChange={handleChangeCurrency}
                         >
                             {
                                 Object.entries(listCurrency).map(([name]) => (
