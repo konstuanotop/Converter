@@ -34,7 +34,11 @@ const Converter: React.FC<ConverterProps> = ({ listCurrency, selectedCurrency, o
                         >
                             {
                                 Object.entries(listCurrency).map(([name]) => (
-                                    <option key={name} value={name}>{name}</option>
+                                    <option
+                                        key={name}
+                                        className={styles.Converter__block_currency_form_select}
+                                        value={name}
+                                    >{name}</option>
                                 ))
                             }
                         </select>

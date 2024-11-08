@@ -13,8 +13,6 @@ const ConverterPage = () => {
     const [valueTo, setValueTo] = useState(1)
     const [loading, setLoading] = useState(true)
 
-    // При вводе значения в input надо произвести вычисления значения валюты и отобразить результат в правой колонке учитыевая какие выбраны валюты в обеих колонках
-
     const handleValueChangeFrom = (valueFrom: number) => {
         if (isNaN(valueFrom) || !refListCurrency.current[selectedCurrencyFrom] || !refListCurrency.current[selectedCurrencyTo]) {
             setValueTo(0)
@@ -50,24 +48,9 @@ const ConverterPage = () => {
         setSelectedCurrencyTo(currency)
     }
 
-    /*     useEffect(() => {
-            fetch('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json')
-                .then((res) => res.json())
-                .then((json) => {
-                    refListCurrency.current = json.usd
-                    onChangeValueTo(1)
-                    setLoading(false)
-                })
-                .catch(error => {
-                    console.error(error)
-                    alert(error)
-                })
-        }, []) */
-
     useEffect(() => {
         CurrencyService.getCurrencyData()
             .then((json) => {
-                console.log(json.usd)
                 refListCurrency.current = json.usd;
                 handleValueChangeTo(1)
                 setLoading(false)
